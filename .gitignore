@@ -1,0 +1,7 @@
+smartcontracts/.infura
+smartcontracts/.secret
+smartcontracts/node_modules/
+smartcontracts/build/
+.vscode/
+backend/node_modules/
+backend/.env
