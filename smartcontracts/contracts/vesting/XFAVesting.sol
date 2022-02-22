@@ -10,6 +10,7 @@ contract XFAVesting {
     uint256 private tokensWithdrawn;
    
     event onUnlockNewTokens(address _user, uint256 _maxTokensUnlocked);
+    event onEmergencyWithdraw();
 
     constructor(address _token, uint256 _listingDate) {
         token = _token;
@@ -68,5 +69,14 @@ contract XFAVesting {
 
     function getTokensInVesting() external view returns(uint256) {
         return IERC20(token).balanceOf(address(this));
+    }
+
+    function emegercyWithdraw() external {
+        require(msg.sender == wallet, "OnlyOwner");
+
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        IERC20(token).transfer(wallet, balance);
+
+        emit onEmergencyWithdraw();
     }
 }

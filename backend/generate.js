@@ -6,6 +6,8 @@ const ico3Abi = require("./contracts/abis/XifraICO3.json");
 const Web3 = require("web3");
 let web3 = null;
 
+const fs = require('fs');
+
 const handleEventBuy = async (event) => {
     const privateKey = process.env.PRIVATE_KEY;
     const { _buyer, _tokens, _paymentAmount, _tokenPayment } = event.returnValues;
@@ -40,38 +42,29 @@ const generateInsertManual = async (_address, _amount) => {
 
 const generateInserts = async () => {
     const rpcUrl = process.env.RPC_URL;
+    const privateKey = process.env.PRIVATE_KEY;
     web3 = new Web3(rpcUrl);
-    const ico2Contract = new web3.eth.Contract(ico2Abi, '0x7488451Db91DF618759b8Af15e36F70c0FDD529E');
-    const ico3Contract = new web3.eth.Contract(ico3Abi, '0x3C532E1ae3AfCa2E5E263e1C852cF38522c737c4');
-    const blockNumber = await web3.eth.getBlockNumber();
 
-    const buyEvents2 = await ico2Contract.getPastEvents(
-        'onTokensBought',
-        { fromBlock: blockNumber - 1000000, toBlock: blockNumber },
-        (error, events) => {
+    fs.readFile("./to_regenerate.txt", 'utf8', async(err, data) => {
+        let dataArray = data.split(/\r?\n/);
+        for (let i=0;i<dataArray.length;i++) {
+            let record = dataArray[i];
+            let splitted = record.split(";");
+            const parameters = await web3.eth.abi.encodeParameters(
+                ["address", "uint256"],
+                [splitted[0], web3.utils.toWei(splitted[1])]
+            );
+            const signature = await web3.eth.accounts.sign(parameters, privateKey);
+        
+            const insertSql = `INSERT INTO Users (account, amount, signedMessage, signature, createdAt, updatedAt) VALUES ('${splitted[0]}',${splitted[1]},'${parameters}','${signature.signature}', null, null);`;
+            console.log(insertSql);
         }
-    );
-
-    for (let index = 0; index < buyEvents2.length; index++) {
-        await handleEventBuy(buyEvents2[index]);
-    }
-
-    const buyEvents3 = await ico3Contract.getPastEvents(
-        'onTokensBought',
-        { fromBlock: blockNumber - 1000000, toBlock: blockNumber },
-        (error, events) => {
-        }
-    );
-
-    for (let index = 0; index < buyEvents3.length; index++) {
-        await handleEventBuy(buyEvents3[index]);
-    }
+    });
 }
 
 (async () => {
     try {
         await generateInserts();
-        //await generateInsertManual('0x1C7e0F5e1431282eFcc1548b2fAB900C11F3ba4D', 800);
     } catch (e) {
         console.log('Error main catch', e.toString());
     }
