@@ -71,9 +71,15 @@ module.exports = {
           enabled: true,
           runs: 200
       },
-      evmVersion: "byzantium"
+      evmVersion: "london"
       }
     }
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: '' // WRITE ETHERSCAN APIKEY
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:

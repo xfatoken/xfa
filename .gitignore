@@ -1,5 +1,3 @@
-smartcontracts/.infura
-smartcontracts/.secret
 smartcontracts/node_modules/
 smartcontracts/build/
 .vscode/

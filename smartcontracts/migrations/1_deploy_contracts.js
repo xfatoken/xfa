@@ -18,8 +18,8 @@ async function doDeploy(deployer, network, accounts) {
     let claimXFAToken = await ClaimXFAToken.deployed();
     console.log('ClaimXFAToken deployed:', claimXFAToken.address);
 
-    await xfaToken.transfer(claimXFAToken.address, web3.utils.toWei('50000000'));
-    console.log('ClaimXFAToken funded with 50.000.000 tokens');
+    await xfaToken.transfer(claimXFAToken.address, web3.utils.toWei('2202880'));
+    console.log('ClaimXFAToken funded with 2.202.880 tokens');
 
     await xfaToken.transfer(xfaVesting.address, web3.utils.toWei('345000000'));
     console.log('Vesting fund with 345.000.000 tokens');
